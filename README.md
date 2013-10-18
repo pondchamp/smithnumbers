@@ -1,0 +1,4 @@
+smithnumbers
+============
+
+Smith Number Generator
