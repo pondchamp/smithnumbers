@@ -8,6 +8,7 @@
 #include <math.h>
 #include <string.h>
 #include <assert.h>
+#include <ctype.h>
 
 #define MAX_FACTOR (int) (max-1)/2
 #define ASCII_TO_NUM 48
@@ -15,23 +16,33 @@
 
 void primeFactors(int max, int *factors);
 int addFactors(int max, int *factors);
+int isSmith (int max);
 
 int main (int argc, char *argv[]) {
-    assert(argc == 2);
-    int max = atoi(argv[1]), i, count, factors[MAX_FACTOR], sumDigits, sumFactors;
-    char digits[strlen(argv[1])+1];
+    assert(argc == 3);
+    int max = atoi(argv[2]), count;
+    assert (max > 0);
     int col = 0;
-    for (count = 2; count <= max; count++) {
-        sumDigits = 0;
-        sumFactors = 0;
-        primeFactors(count, factors);
-        sprintf(digits, "%d", count);
-        for (i = 0; digits[i] != '\0'; i++) sumDigits += (int) digits[i] - ASCII_TO_NUM;
-        sumFactors = addFactors(count, factors);
-        if (sumFactors == sumDigits) {printf("%d\t", count); col++;}
-        if (col == MAX_COL) {printf("\n"); col = 0;}
-    }
+    if (!strcmp(argv[1], "-all")) {
+        for (count = 2; count <= max; count++) {
+            if (isSmith (count)) {printf("%d\t", count); col++;}
+            if (col == MAX_COL) {printf("\n"); col = 0;}
+        }
+    } else if (!strcmp(argv[1], "-check")) {
+        if (isSmith (max)) printf("%d is a Smith number!\n", max);
+        else printf("%d is not a Smith number!\n", max);
+    } else printf("Invalid arguments. Valid arguments are '-all' and '-check'.\n");
     return EXIT_SUCCESS;
+}
+
+int isSmith (int max) {
+    int i, factors[MAX_FACTOR], sumDigits = 0, sumFactors = 0;
+    char digits[50];
+    primeFactors(max, factors);
+    sprintf(digits, "%d", max);
+    for (i = 0; digits[i] != '\0'; i++) sumDigits += (int) digits[i] - ASCII_TO_NUM;
+    sumFactors = addFactors(max, factors);
+    return (sumFactors == sumDigits);
 }
 
 void primeFactors(int max, int *factors) {
